@@ -1,56 +1,80 @@
-#include<iostream>
+#include <bits/stdc++.h>
+#include <chrono>
+#include <cstdlib>
 using namespace std;
+using namespace std::chrono;
 
-class heap{
-    int arr[100];
-    int size;
+void merge(int arr[], int start, int mid, int end) {
+    int i = start, j = mid + 1;
+    int k = 0;
+    int temp[end - start + 1];
 
-    public:
-
-    heap(){
-        arr[0]=-1;
-        size =0;
-        
+    while (i <= mid && j <= end) {
+        if (arr[i] < arr[j]) {
+            temp[k++] = arr[i++];
+        } else {
+            temp[k++] = arr[j++];
+        }
     }
 
-    void insert(int val){
-        size =size + 1;
-        int index =size ;
-        arr[index]=val;
-
-        while(index > 1){
-
-            int parent = index/2;
-            if( arr[index]>arr[parent ]){
-
-               swap( arr[parent], arr[index]);
-                index =parent;
-
-            }
-            else{
-            return;}
-
-
-    }
-    }
-    void print(){
-        for(int i=1; i<size; i++){
-            cout<<arr[i]<<" ";
-        }cout<<endl;
+    while (i <= mid) {
+        temp[k++] = arr[i++];
     }
 
-};
-int main(){
-    heap h;
-     h.insert(5);
-     h.insert(8);
-     h.insert(90);
-     h.insert(78);
-     h.insert(56);
-     h.insert(72);
-     h.insert(17);
-     h.print();
+    while (j <= end) {
+        temp[k++] = arr[j++];
+    }
 
-    
+    for (int i = 0; i <= end - start; i++) {
+        arr[start + i] = temp[i];
+    }
+}
 
+void mergesort(int arr[], int start, int end) {
+    if (start < end) {
+        int mid = (start + end) / 2;
+        mergesort(arr, start, mid);
+        mergesort(arr, mid + 1, end);
+        merge(arr, start, mid, end);
+    }
+}
+
+void generateRandomInputs(int arr[], int size) {
+    for (int i = 0; i < size; ++i) {
+        arr[i] = rand() % 1000; // Generating random numbers between 0 and 999
+    }
+}
+
+int main() {
+    srand(time(0)); // Seed for random number generation
+
+    const int numInputs = 10;
+    int arraySizes[numInputs];
+    int result[numInputs];
+
+    for (int i = 0; i < numInputs; ++i) {
+        arraySizes[i] = (i + 1) * 100; // Adjust the sizes as needed
+    }
+
+    for (int i = 0; i < numInputs; ++i) {
+        int arraySize = arraySizes[i];
+        int arr[arraySize];
+
+        generateRandomInputs(arr, arraySize);
+
+        auto start = high_resolution_clock::now();
+        mergesort(arr, 0, arraySize - 1);
+        auto stop = high_resolution_clock::now();
+
+        auto duration = duration_cast<nanoseconds>(stop - start);
+
+        result[i] = duration.count();
+    }
+
+    cout << "Input Size\tTime Taken (microseconds)\n";
+    for (int i = 0; i < numInputs; ++i) {
+        cout << arraySizes[i] << "\t\t" << result[i] << endl;
+    }
+
+    return 0;
 }
